@@ -9,12 +9,15 @@ import app from "./app";
 var debug = require("debug")("socketio-server:server");
 import * as http from "http";
 import socketServer from "./socket";
+import { config as loadEnv } from 'dotenv';
+
+loadEnv();
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || "9000");
+var port = normalizePort(process.env.PORT || 9000);
 app.set("port", port);
 
 /**
