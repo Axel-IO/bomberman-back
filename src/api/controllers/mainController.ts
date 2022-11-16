@@ -8,13 +8,21 @@ import {
   SocketIO,
 } from "socket-controllers";
 import { Socket, Server } from "socket.io";
+import { initBoard } from "../gameLogic/board";
+import { Square } from "../gameLogic/type";
+import { Player } from "./type";
 
 @SocketController()
 export class MainController {
-  socketList = [];
-  players = {};
+  public socketList: Socket[];
+  public players: Record<string, Player>;
+  public board: Square[][];
 
-  constructor() {}
+  constructor() {
+    this.socketList = []
+    this.players = {}
+    this.board = initBoard(10, 20);
+  }
 
   @OnConnect()
   public onConnection(
@@ -31,6 +39,7 @@ export class MainController {
       speed: 5,
       color: "#" + (((1 << 24) * Math.random()) | 0).toString(16),
     };
+    socket.emit("init_board", this.board);
 
     setInterval(() => {
       socket.emit("update_players", this.players);
@@ -68,16 +77,10 @@ export class MainController {
     if (direction == "LEFT") player.x -= player.speed;
     if (direction == "RIGHT") player.x += player.speed;
 
-    const borderSize = player.size/2
-    // const borderSize = 0
+    const borderSize = player.size / 2;
     if (player.y - borderSize <= 0) player.y = borderSize;
     if (player.y + borderSize >= maxHeight) player.y = maxHeight - borderSize;
     if (player.x - borderSize <= 0) player.x = borderSize;
     if (player.x + borderSize >= maxWidth) player.x = maxWidth - borderSize;
-
-    // if (player.y <= 0) player.y = 0;
-    // if (player.y + borderSize >= maxHeight) player.y = maxHeight - borderSize;
-    // if (player.x <= 0) player.x = 0;
-    // if (player.x + borderSize >= maxWidth) player.x = maxWidth - borderSize;
   }
 }
